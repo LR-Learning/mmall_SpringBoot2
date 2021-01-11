@@ -9,7 +9,6 @@ target/
 
 #eclipse ignore
 .settings/
-.project
 .classpatch
 
 HELP.md
@@ -28,7 +27,7 @@ HELP.md
 
 ### IntelliJ IDEA ###
 .idea/
-.idea/
+/idea/
 *.iws
 *.iml
 *.ipr
