@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.*;
 import org.mybatis.spring.annotation.MapperScan;
 
 @Mapper
-@MapperScan("src/main/resources/mappers/*.xml")
 public interface UserMapper {
     int deleteByPrimaryKey(Integer id);
 
