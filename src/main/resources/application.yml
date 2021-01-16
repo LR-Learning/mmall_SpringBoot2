@@ -22,3 +22,12 @@ spring:
   mybatis:
     config-locations: classpath:mybatis/mybatis-config.xml
     mapper-locations: classpath:mappers/*.xml
+
+## ftp 配置
+ftp:
+  server:
+    ip: 182.92.82.103
+    http:
+      prefix: http://img.happymall.com/
+  user: mmallftp
+  pass: mall123456
