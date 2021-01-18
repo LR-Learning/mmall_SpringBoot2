@@ -2,8 +2,11 @@ package com.mmall.dao;
 
 import com.mmall.pojo.Product;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 public interface ProductMapper {
     int deleteByPrimaryKey(Integer id);
@@ -44,4 +47,10 @@ public interface ProductMapper {
             "      update_time = now()\n" +
             "    where id = #{id,jdbcType=INTEGER}")
     int updateByPrimaryKey(Product record);
+
+    @Select("select * from mmall_product order by id asc")
+    List<Product> selectList();
+
+   @Select("select * from mmall_product where name like productName = #{productName} and id = {productId}")
+    List<Product> selectByNameAndProductId(@Param("productName")String productName, @Param("productId") Integer productId);
 }

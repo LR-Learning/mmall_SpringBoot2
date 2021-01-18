@@ -1,18 +1,25 @@
 package com.mmall.controller.backend;
 
+import com.google.common.collect.Maps;
 import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.Product;
 import com.mmall.pojo.User;
+import com.mmall.service.IFileService;
 import com.mmall.service.IProductService;
 import com.mmall.service.IUserService;
+import com.mmall.utils.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 /**
  * @Author: LR
@@ -30,6 +37,10 @@ public class ProductManageController {
 
     @Autowired
     private IProductService iProductService;
+
+    @Autowired
+    private IFileService iFileService;
+
 
     // 保存、更新商品
     @RequestMapping("save.do")
@@ -71,5 +82,46 @@ public class ProductManageController {
         }else{
             return ServerResponse.createByErrorMessage("无权限操作");
         }
+    }
+
+    // 后台商品列表动态分页功能
+    @RequestMapping("list.do")
+    public ServerResponse getList(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSzie", defaultValue = "10")int pageSzie){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录管理员");
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()){
+            return iProductService.getProductList(pageNum, pageSzie);
+        }else{
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
+
+    // 后台商品搜索功能
+    @RequestMapping("search.do")
+    public ServerResponse productSearch(HttpSession session, String productName, Integer productId, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSzie", defaultValue = "10")int pageSzie){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录管理员");
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()){
+            return iProductService.searchProduct(productName, productId, pageNum, pageSzie);
+        }else{
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
+
+    // 文件上传
+    @RequestMapping("upload.do")
+    public ServerResponse upload(MultipartFile file, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String targetFileName = iFileService.upload(file, path);
+        String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
+        Map fileMap = Maps.newHashMap();
+        fileMap.put("uri", targetFileName);
+        fileMap.put("url", url);
+
+        return ServerResponse.createBySuccess(fileMap);
     }
 }
