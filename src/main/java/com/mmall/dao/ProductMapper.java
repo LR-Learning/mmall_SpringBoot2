@@ -53,4 +53,9 @@ public interface ProductMapper {
 
    @Select("select * from mmall_product where name like productName = #{productName} and id = {productId}")
     List<Product> selectByNameAndProductId(@Param("productName")String productName, @Param("productId") Integer productId);
+
+   // @Select("select * from mmall_product")
+   List<Product> selectByNameAndCategoryIds(@Param("productName")String productName, @Param("categoryIdList")List<Integer> categoryIdList);
+
+
 }
